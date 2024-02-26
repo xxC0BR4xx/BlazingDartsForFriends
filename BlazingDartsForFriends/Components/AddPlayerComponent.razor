@@ -1,0 +1,72 @@
+﻿@using BlazingDartsForFriends.Pages
+@using Blazor.IndexedDB.Framework
+@using Classes
+@using System.Text.Json
+@using global::Classes
+@inject IndexedDbAccessor IndexedDbAccessor
+@inject StateContainer StateContainer
+
+
+<div class="AddPlayerComponentWrapper">
+    <b>Name?</b>
+
+    <InputText @bind-Value=newPlayerName></InputText>
+
+    <Button Color="Color.Primary" @onclick="addPlayer">Add Player</Button>
+</div>
+
+@code {
+    private string newPlayerName;
+    public string BookName { get; set; } = "";
+    public string StoredValue { get; set; } = "";
+    public Home home;
+
+
+    public async Task addPlayer()
+    {
+
+        Player value = new Player(StateContainer.playerID, newPlayerName);
+        await IndexedDbAccessor.SetValueAsync<Player>("players", value);
+
+        Console.WriteLine(newPlayerName);
+
+        StateContainer.playerID += 1;
+        await IndexedDbAccessor.SetValueAtPositionAsync<int>("playerID", 0, StateContainer.playerID);
+        StateContainer.isAddPlayerComponentVisible = !StateContainer.isAddPlayerComponentVisible;
+        StateContainer.home.render();
+    }
+
+    private void UpdatePlayerName(ChangeEventArgs e)
+    {
+        newPlayerName = e.Value.ToString();
+
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // This code will only run after the first render
+            Console.WriteLine("Component has been rendered for the first time.");
+        }
+        else
+        {
+            // This code will run after subsequent renders
+
+            GetPlayerIDAsync();
+
+            Console.WriteLine("Component has been re-rendered.");
+        }
+
+    }
+
+    public async Task GetPlayerIDAsync()
+    {
+         StateContainer.playerID = await IndexedDbAccessor.GetValueAsync<int>("playerID", 0);
+
+        
+    }
+
+
+
+}

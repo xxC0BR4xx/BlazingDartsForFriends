@@ -1,0 +1,25 @@
+﻿body {
+    height:100vh;
+}
+#app{
+    height:100vh;
+}
+
+.HomeCardContainer {
+    display: grid;
+    padding:5%;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto; /* Change to 'auto' or specific height if needed */
+    justify-content: space-around;
+    align-items: stretch; /* Ensure grid items stretch vertically */
+    gap: 20px; /* Adjust gap between grid items as needed */
+    width: 100%;
+    height: 100vh;
+}
+
+    .HomeCardContainer > * {
+        /* Optionally, you can set specific styles for grid items */
+        /* For example, to ensure items fill the available space */
+        width: 100%; /* Ensure items fill available width */
+        height: 100%; /* Ensure items fill available height */
+    }

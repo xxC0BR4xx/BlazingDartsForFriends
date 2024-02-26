@@ -1,0 +1,28 @@
+﻿<div class="homeCardWrapper" @onclick="OnClick">
+    <img id="img" src="./images/@imgSource" />
+
+    <div id="HomeCardTitle">
+        <b>
+            @title
+        </b>
+    </div>
+
+</div>
+@code {
+    [Parameter]
+    public string title { get; set; } = "StandartText";
+
+    [Parameter]
+    public EventCallback OnCardClick { get; set; }
+
+    [Parameter]
+    public string imgSource { get;set; }
+
+
+    private async Task OnClick()
+    {
+        await OnCardClick.InvokeAsync();
+    }
+
+}
+

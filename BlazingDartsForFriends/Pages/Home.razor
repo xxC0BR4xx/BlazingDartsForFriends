@@ -1,0 +1,65 @@
+﻿@page "/"
+@using BlazingDartsForFriends.Components
+
+@inject StateContainer StateContainer
+
+
+@if (!StateContainer.isAddPlayerComponentVisible)
+{
+
+    <div class="HomeCardContainer">
+        <HomeCardComponent title="New Game" imgSource="dart_board.svg">
+
+        </HomeCardComponent>
+
+        <HomeCardComponent title="Add Player" OnCardClick="toggleAddPlayer" imgSource="add_player.svg">
+
+        </HomeCardComponent>
+
+            <HomeCardComponent title="Statistics" imgSource="statistics.svg">
+
+            </HomeCardComponent>
+        
+
+        <HomeCardComponent title="Settings" imgSource="settings.svg">
+
+        </HomeCardComponent>
+
+    </div>
+}
+
+
+@if (StateContainer.isAddPlayerComponentVisible){
+
+
+<AddPlayerComponent >
+    
+</AddPlayerComponent>
+
+}
+
+
+@code{
+
+
+
+    private void toggleAddPlayer()
+    {
+        StateContainer.home = this;
+        StateContainer.isAddPlayerComponentVisible = !StateContainer.isAddPlayerComponentVisible;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+        }
+
+    }
+
+    public void render()
+    {
+        StateHasChanged();
+    }
+
+}

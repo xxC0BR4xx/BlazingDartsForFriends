@@ -1,0 +1,23 @@
+﻿body {
+}
+
+.homeCardWrapper {
+    border-radius: 25px;
+    background-color: aliceblue;
+    position:relative;
+}
+#HomeCardTitle {
+    height: 20%;
+    width: 20%;
+    left: 44%;
+    position: relative
+}
+
+
+#img {
+    width: 5vh;
+    height: 5vh;
+    top: 50%;
+    left: 45%;
+    position:relative
+}
