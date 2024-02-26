@@ -1,0 +1,67 @@
+﻿<div id="Game-Wrapper">
+
+
+<div id="Points-Keyboard">
+
+    <div>
+            <div>1
+            </div>
+           
+            
+           
+            
+            
+    </div>
+
+        <div>
+            <div>
+                2
+            </div>
+        </div>
+
+        <div>
+            <div>
+                3
+            </div>
+        </div>
+
+        <div>
+            <div>
+                4
+            </div>
+        </div>
+
+        <div>
+            <div>
+                5
+            </div>
+        </div>
+
+        <div>
+            <div>
+                6
+            </div>
+        </div>
+
+</div>
+
+<div id="Points-Overview">
+    <ListGroup>
+            @foreach (Player player in StateContainer.activePlayers)
+            {
+                <ListGroupItem>
+                    <b>@player.Name</b>
+                    <div>@player.goalScore</div>
+                    <div>@player.getCurrentAverage()</div>
+                </ListGroupItem>
+            }
+
+    </ListGroup>
+       
+    </div>
+</div>
+@code {
+
+    
+
+}

@@ -1,5 +1,132 @@
-﻿<h3>GameSettingsComponent</h3>
+﻿@using System.Text.Json
+
+
+<div id="GameSettingsWrapper">
+    <b> Choose Players</b>
+     <ListGroup id="Players">
+        @foreach (Player player in StateContainer.Players)
+        {
+            <ListGroupItem>
+               <div itemWrapper>
+                   <InputCheckbox @bind-Value=player.IsActive>
+
+                   </InputCheckbox>
+                   <div >
+                       @player.Name;
+                   </div>
+               </div>
+            </ListGroupItem>
+            
+        }
+    </ListGroup>
+
+    <b>Choose Game Settings</b>
+    <ListGroup id="gameSettings" style="inline-grid">
+        <ListGroupItem style="inline-grid">
+            <b>Mode</b>
+            <Select @bind-SelectedValue="@selectedValue">
+                <SelectItem Value="1">X01</SelectItem>
+            </Select>
+        </ListGroupItem>
+
+
+        <ListGroupItem style="inline-grid">
+            <b>Points</b>
+            <Select @bind-SelectedValue="@selectedValue">
+                <SelectItem Value="1">101</SelectItem>
+                <SelectItem Value="2">301</SelectItem>
+                <SelectItem Value="3">501</SelectItem>
+
+            </Select>
+        </ListGroupItem>
+
+        <ListGroupItem style="inline-grid">
+            <b>Checkout</b>
+            <Select @bind-SelectedValue="@selectedValue">
+                <SelectGroup>
+                    <SelectItem Value="1">Single Out</SelectItem>
+
+                </SelectGroup>
+
+                <SelectGroup>
+                    <SelectItem Value="2">Double Out</SelectItem>
+
+                </SelectGroup>
+            </Select>
+        </ListGroupItem>
+        
+    </ListGroup>
+
+    
+
+</div>
+
+<Button Color="Color.Primary" @onclick="startGame" style="position:absolute; bottom:0vh; right:1vh; ">
+    Start
+</Button>
 
 @code {
+    private int selectedValue;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await GetPlayerIDAsync();
+        await LoadPlayers();
+        StateContainer.game.render();
+
+    }
+
+    private async Task LoadPlayers()
+    {
+        for(int i = 0; i < StateContainer.playerID; i++)
+        {
+            await GetValueAsync(i);
+
+        }
+
+        @foreach (Player player in StateContainer.Players)
+        {
+            Console.WriteLine(player.Name);
+        }
+        Console.WriteLine("Count is " + StateContainer.Players.Count);
+
+        StateContainer.game.render();
+
+    }
+
+
+
+    public async Task GetPlayerIDAsync()
+    {
+        StateContainer.playerID = await IndexedDbAccessor.GetValueAsync<int>("playerID", 0);
+
+
+    }
+
+    public async Task GetValueAsync(int i)
+    {
+        JsonDocument storedPlayer = await IndexedDbAccessor.GetValueAsync<JsonDocument>("players", i);
+        string name = storedPlayer.RootElement.GetProperty("name").GetString() ?? "";
+        StateContainer.Players.Add(new Player(i, name));
+
+        Console.WriteLine("Added Player " + name);
+    }
+
+    public void startGame()
+    {
+        StateContainer.isGameOver = false;
+        savePlayers();
+        StateContainer.game.render();
+    }
+
+    public void savePlayers()
+    {
+        foreach(Player player in StateContainer.Players)
+        {
+            if (player.IsActive)
+            {
+                StateContainer.activePlayers.Add(player);
+            }
+        }
+    }
 }

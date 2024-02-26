@@ -1,0 +1,26 @@
+﻿body {
+}
+
+#Points-Keyboard{
+    background-color:aliceblue;
+    border-radius:25px;
+    display: grid;
+    grid-template-columns:repeat(6,1fr);
+    grid-template-columns:repeat(5,1fr);
+
+}
+
+#Game-Wrapper {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr;
+    justify-content: space-around;
+    align-items: stretch; /* Ensure grid items stretch vertically */
+    grid-gap: 20px; /* Adjust gap between grid items as needed */
+    height: 100vh;
+}
+
+#Points-Overview {
+    background-color: aliceblue;
+    border-radius: 25px;
+}

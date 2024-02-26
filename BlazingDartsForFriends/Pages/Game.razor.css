@@ -1,0 +1,20 @@
+﻿body {
+    height:100vh;
+}
+
+.GameSettings {
+    height:100vh;
+    margin-left: 5vh;
+    margin-right: 5vh;
+    position: relative
+}
+
+#Game-Wrapper {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows:1fr;
+    justify-content: space-around;
+    align-items: stretch; /* Ensure grid items stretch vertically */
+    gap: 20px; /* Adjust gap between grid items as needed */
+    height: 100vh;
+}

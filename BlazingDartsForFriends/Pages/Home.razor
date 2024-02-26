@@ -1,5 +1,4 @@
 ﻿@page "/"
-@using BlazingDartsForFriends.Components
 
 @inject StateContainer StateContainer
 
@@ -8,9 +7,14 @@
 {
 
     <div class="HomeCardContainer">
-        <HomeCardComponent title="New Game" imgSource="dart_board.svg">
+        <a href="/game">
 
-        </HomeCardComponent>
+            <HomeCardComponent title="New Game" imgSource="dart_board.svg">
+
+            </HomeCardComponent>
+
+        </a>
+       
 
         <HomeCardComponent title="Add Player" OnCardClick="toggleAddPlayer" imgSource="add_player.svg">
 

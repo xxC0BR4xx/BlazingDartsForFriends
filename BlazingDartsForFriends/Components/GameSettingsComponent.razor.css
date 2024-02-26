@@ -1,2 +1,13 @@
 ﻿body {
 }
+
+
+#gameSettings{
+    top:60vh;
+}
+
+#GameSettingsWrapper{
+
+    height:100vh;
+
+}
