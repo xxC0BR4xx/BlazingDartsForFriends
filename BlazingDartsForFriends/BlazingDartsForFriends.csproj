@@ -8,12 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Components\AddPlayerComponent.razor.css" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Classes\Player.cs" />
-    <Content Include="Components\AddPlayerComponent.razor.css" />
   </ItemGroup>
 
   <ItemGroup>

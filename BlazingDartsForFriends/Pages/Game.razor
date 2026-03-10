@@ -1,38 +1,26 @@
 ﻿@page "/game"
-
-
+@inject NavigationManager NavigationManager
 
 @if (StateContainer.isGameOver)
 {
-
-
     <div class="GameSettings">
-
         <GameSettingsComponent>
         </GameSettingsComponent>
-
-
     </div>
 }
 else
 {
-<GameComponent>
-
-</GameComponent>
-    }
-  
+    <GameComponent>
+    </GameComponent>
+}
 
 @code {
-
-
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
         }
         StateContainer.game = this;
-
     }
 
     public void render()

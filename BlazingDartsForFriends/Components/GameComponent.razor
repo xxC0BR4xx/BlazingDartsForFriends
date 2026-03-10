@@ -1,67 +1,364 @@
-﻿<div id="Game-Wrapper">
+﻿@using BlazingDartsForFriends.Models
+@inject NavigationManager NavigationManager
+@implements IDisposable
 
-
-<div id="Points-Keyboard">
-
-    <div>
-            <div>1
+<div id="Game-Wrapper">
+    @if (gameState != null)
+    {
+        <div id="Game-Header">
+            <div class="header-left">
+                <Button Color="Color.Secondary" @onclick="ShowBackConfirmation" Size="Size.Small" Class="back-button">
+                    <Icon Name="IconName.ArrowLeft" />
+                    Back
+                </Button>
+                <h3>@GetGameTitle()</h3>
             </div>
-           
-            
-           
-            
-            
-    </div>
-
-        <div>
-            <div>
-                2
-            </div>
+            <Button Color="Color.Danger" @onclick="ShowEndGameConfirmation" Size="Size.Small">
+                <Icon Name="IconName.Times" />
+                End Game
+            </Button>
         </div>
 
-        <div>
-            <div>
-                3
+        @if (gameState.IsFinished)
+        {
+            <div id="Game-Finished">
+                <h2>🎯 Game Over! 🎯</h2>
+                <h3>Winner: @GetWinnerName()</h3>
+                <Button Color="Color.Primary" @onclick="EndGame">Back to Settings</Button>
             </div>
-        </div>
+        }
+        else
+        {
+            <div id="Game-Content">
+                <div id="Current-Player-Section">
+                    <h4>Current Player: @gameState.CurrentPlayer.PlayerName</h4>
+                    <div id="Current-Turn">
+                        <h5>Throws this turn: @currentTurn.Throws.Count / 3</h5>
+                        @foreach (var dartThrow in currentTurn.Throws)
+                        {
+                            <span class="throw-badge">
+                                @GetThrowDisplay(dartThrow)
+                            </span>
+                        }
+                    </div>
+                </div>
 
-        <div>
-            <div>
-                4
+                <div id="Score-Input-Section">
+                    <div id="Dart-Score-Selector">
+                        <h5>Select Score:</h5>
+                        <div class="score-grid">
+                            @for (int i = 1; i <= 20; i++)
+                            {
+                                var score = i;
+                                <Button Color="@(selectedScore == score ? Color.Primary : Color.Light)" 
+                                        @onclick="() => SelectScore(score)" 
+                                        Class="score-button">
+                                    @score
+                                </Button>
+                            }
+                        </div>
+                        <div class="special-buttons">
+                            <Button Color="@(selectedScore == 25 ? Color.Success : Color.Light)" 
+                                    @onclick="() => SelectScore(25)" 
+                                    Class="special-button bull-button">
+                                <Icon Name="IconName.Circle" />
+                                Bull (25)
+                            </Button>
+                            <Button Color="@(selectedScore == 0 ? Color.Warning : Color.Light)" 
+                                    @onclick="() => SelectScore(0)" 
+                                    Class="special-button miss-button">
+                                <Icon Name="IconName.Ban" />
+                                Miss
+                            </Button>
+                        </div>
+                    </div>
+
+                    @if (selectedScore.HasValue)
+                    {
+                        <div id="Multiplier-Selector">
+                            <h5>Select Multiplier for @selectedScore:</h5>
+                            <Button Color="Color.Info" @onclick="() => AddThrow(1)">Single</Button>
+                            <Button Color="Color.Warning" @onclick="() => AddThrow(2)">Double</Button>
+                            @if (selectedScore != 25)
+                            {
+                                <Button Color="Color.Danger" @onclick="() => AddThrow(3)">Triple</Button>
+                            }
+                            <Button Color="Color.Secondary" @onclick="CancelSelection">Cancel</Button>
+                        </div>
+                    }
+
+                    @if (currentTurn.Throws.Any())
+                    {
+                        <div id="Turn-Actions">
+                            <Button Color="Color.Success" @onclick="CompleteTurn" Size="Size.Large">
+                                Complete Turn
+                            </Button>
+                            <Button Color="Color.Warning" @onclick="UndoLastThrow">
+                                Undo Last Throw
+                            </Button>
+                            <Button Color="Color.Danger" @onclick="MarkAsBust">
+                                Mark as Bust
+                            </Button>
+                        </div>
+                    }
+                </div>
+
+                <div id="Players-Overview">
+                    <h4>Scores</h4>
+                    <ListGroup>
+                        @foreach (var player in gameState.PlayerStates)
+                        {
+                            <ListGroupItem Active="@(player.PlayerId == gameState.CurrentPlayer.PlayerId)">
+                                <div class="player-score-card">
+                                    <div class="player-name">
+                                        <strong>@player.PlayerName</strong>
+                                        @if (player.PlayerId == gameState.CurrentPlayer.PlayerId)
+                                        {
+                                            <Badge Color="Color.Primary">Current</Badge>
+                                        }
+                                    </div>
+                                    <div class="player-stats">
+                                        <div>Score: <strong>@player.CurrentScore</strong></div>
+                                        <div>Average: @player.Average.ToString("F2")</div>
+                                        <div>Darts: @player.DartsThrown</div>
+                                    </div>
+                                </div>
+                            </ListGroupItem>
+                        }
+                    </ListGroup>
+                </div>
             </div>
-        </div>
-
-        <div>
-            <div>
-                5
-            </div>
-        </div>
-
-        <div>
-            <div>
-                6
-            </div>
-        </div>
-
+        }
+    }
 </div>
 
-<div id="Points-Overview">
-    <ListGroup>
-            @foreach (Player player in StateContainer.activePlayers)
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger alert-floating">
+        <Icon Name="IconName.ExclamationTriangle" />
+        @errorMessage
+    </div>
+}
+
+<Modal @ref="confirmationModal">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>
+                <Icon Name="IconName.ExclamationTriangle" />
+                @confirmationTitle
+            </ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <p>@confirmationMessage</p>
+            @if (!gameState?.IsFinished ?? false)
             {
-                <ListGroupItem>
-                    <b>@player.Name</b>
-                    <div>@player.goalScore</div>
-                    <div>@player.getCurrentAverage()</div>
-                </ListGroupItem>
+                <Alert Color="Color.Warning" Visible>
+                    <Icon Name="IconName.InfoCircle" />
+                    <strong>Warning:</strong> The current game will be lost!
+                </Alert>
             }
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" @onclick="HideConfirmation">
+                <Icon Name="IconName.Times" />
+                Cancel
+            </Button>
+            <Button Color="Color.Danger" @onclick="ConfirmAction">
+                <Icon Name="IconName.Check" />
+                @confirmationButtonText
+            </Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
 
-    </ListGroup>
-       
-    </div>
-</div>
 @code {
+    private GameState? gameState;
+    private Turn currentTurn = new Turn();
+    private int? selectedScore;
+    private string? errorMessage;
+    private Modal? confirmationModal;
+    private string confirmationTitle = "";
+    private string confirmationMessage = "";
+    private string confirmationButtonText = "";
+    private Action? confirmedAction;
 
-    
+    protected override void OnInitialized()
+    {
+        gameState = StateContainer.GameService.CurrentGame;
+        if (gameState != null)
+        {
+            currentTurn = StateContainer.GameService.CreateNewTurn();
+        }
+        StateContainer.GameService.OnGameStateChanged += HandleGameStateChanged;
+    }
 
+    private void HandleGameStateChanged()
+    {
+        gameState = StateContainer.GameService.CurrentGame;
+        if (gameState != null && !gameState.IsFinished)
+        {
+            currentTurn = StateContainer.GameService.CreateNewTurn();
+        }
+        StateHasChanged();
+    }
+
+    private void SelectScore(int score)
+    {
+        selectedScore = score;
+        errorMessage = null;
+    }
+
+    private void CancelSelection()
+    {
+        selectedScore = null;
+    }
+
+    private void AddThrow(int multiplier)
+    {
+        if (!selectedScore.HasValue) return;
+
+        var dartThrow = new Throw
+        {
+            Score = selectedScore.Value,
+            Multiplier = multiplier
+        };
+
+        var validation = StateContainer.GameService.ValidateThrow(dartThrow);
+        if (!validation.IsValid)
+        {
+            errorMessage = validation.ErrorMessage;
+            return;
+        }
+
+        currentTurn.AddThrow(dartThrow);
+        selectedScore = null;
+        errorMessage = null;
+
+        if (currentTurn.Throws.Count >= 3)
+        {
+            CompleteTurn();
+        }
+    }
+
+    private void UndoLastThrow()
+    {
+        if (currentTurn.Throws.Any())
+        {
+            currentTurn.Throws.RemoveAt(currentTurn.Throws.Count - 1);
+        }
+    }
+
+    private void MarkAsBust()
+    {
+        currentTurn.IsBust = true;
+        CompleteTurn();
+    }
+
+    private void CompleteTurn()
+    {
+        if (!currentTurn.Throws.Any() && !currentTurn.IsBust)
+        {
+            errorMessage = "Please add at least one throw or mark as bust";
+            return;
+        }
+
+        StateContainer.GameService.ProcessTurn(currentTurn);
+
+        if (!StateContainer.GameService.IsGameFinished())
+        {
+            currentTurn = StateContainer.GameService.CreateNewTurn();
+        }
+
+        errorMessage = null;
+    }
+
+    private void EndGame()
+    {
+        StateContainer.GameService.EndGame();
+        StateContainer.isGameOver = true;
+        StateContainer.activePlayers.Clear();
+        StateContainer.game?.render();
+    }
+
+    private void ShowBackConfirmation()
+    {
+        if (!gameState?.IsFinished ?? false)
+        {
+            confirmationTitle = "Leave Game?";
+            confirmationMessage = "Are you sure you want to go back? The current game will be lost.";
+            confirmationButtonText = "Leave Game";
+            confirmedAction = () => NavigationManager.NavigateTo("/");
+            confirmationModal?.Show();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private void ShowEndGameConfirmation()
+    {
+        if (!gameState?.IsFinished ?? false)
+        {
+            confirmationTitle = "End Game?";
+            confirmationMessage = "Are you sure you want to end this game?";
+            confirmationButtonText = "End Game";
+            confirmedAction = EndGame;
+            confirmationModal?.Show();
+        }
+        else
+        {
+            EndGame();
+        }
+    }
+
+    private void HideConfirmation()
+    {
+        confirmationModal?.Hide();
+        confirmedAction = null;
+    }
+
+    private void ConfirmAction()
+    {
+        confirmationModal?.Hide();
+        confirmedAction?.Invoke();
+        confirmedAction = null;
+    }
+
+    private string GetGameTitle()
+    {
+        if (gameState == null) return "";
+
+        return gameState.Settings.GameMode switch
+        {
+            GameMode.X01 => $"{gameState.Settings.StartingScore} - {gameState.Settings.CheckoutMode}",
+            GameMode.Cricket => "Cricket",
+            GameMode.AroundTheClock => "Around the Clock",
+            _ => "Darts Game"
+        };
+    }
+
+    private string GetWinnerName()
+    {
+        if (gameState?.WinnerId == null) return "";
+        var winner = gameState.PlayerStates.FirstOrDefault(p => p.PlayerId == gameState.WinnerId);
+        return winner?.PlayerName ?? "";
+    }
+
+    private string GetThrowDisplay(Throw dartThrow)
+    {
+        var prefix = dartThrow.Multiplier switch
+        {
+            2 => "D",
+            3 => "T",
+            _ => ""
+        };
+        return $"{prefix}{dartThrow.Score} ({dartThrow.TotalScore})";
+    }
+
+    public void Dispose()
+    {
+        StateContainer.GameService.OnGameStateChanged -= HandleGameStateChanged;
+    }
 }

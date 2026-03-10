@@ -2,16 +2,17 @@
 {
     public class Player
     {
-        public Player(int id, string Name) {
-            this.Id = id;
-            this.Name = Name;
-            this.currentScoreStack = new Stack<int>();
-            this.scoreStack = new Stack<int>();
-
+        public Player(int id, string name)
+        {
+            Id = id;
+            Name = name;
+            currentScoreStack = new Stack<int>();
+            scoreStack = new Stack<int>();
         }
 
         [System.ComponentModel.DataAnnotations.Key]
         public int Id { get; set; }
+
         public string Name { get; set; }
 
         public Stack<int> scoreStack;
@@ -24,18 +25,20 @@
         public double getCurrentAverage()
         {
             int average = 0;
-            foreach(int i in currentScoreStack) {
+            foreach (int i in currentScoreStack)
+            {
                 average += i;
             }
             int j = currentScoreStack.Count;
             if (j > 0)
             {
                 average = average / j;
-
             }
-            else average = 0;
+            else
+            {
+                average = 0;
+            }
             return average;
         }
-        
     }
 }

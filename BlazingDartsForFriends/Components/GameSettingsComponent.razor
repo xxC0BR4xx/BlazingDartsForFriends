@@ -1,106 +1,135 @@
 ﻿@using System.Text.Json
-
+@using BlazingDartsForFriends.Models
+@inject NavigationManager NavigationManager
 
 <div id="GameSettingsWrapper">
-    <b> Choose Players</b>
-     <ListGroup id="Players">
-        @foreach (Player player in StateContainer.Players)
+    <div class="settings-header">
+        <Button Color="Color.Light" @onclick="GoBack" Size="Size.Small" Class="back-button-settings">
+            <Icon Name="IconName.ArrowLeft" />
+            Back
+        </Button>
+        <h2>Game Setup</h2>
+    </div>
+
+    <div class="settings-section">
+        <h3>
+            <Icon Name="IconName.Users" />
+            Choose Players
+        </h3>
+
+        @if (StateContainer.Players.Any())
         {
-            <ListGroupItem>
-               <div itemWrapper>
-                   <InputCheckbox @bind-Value=player.IsActive>
-
-                   </InputCheckbox>
-                   <div >
-                       @player.Name;
-                   </div>
-               </div>
-            </ListGroupItem>
-            
+            <div class="players-grid">
+                @foreach (Player player in StateContainer.Players)
+                {
+                    <div class="player-card @(player.IsActive ? "active" : "")" @onclick="() => TogglePlayer(player)">
+                        <div class="player-checkbox">
+                            <InputCheckbox @bind-Value="player.IsActive" @onclick:stopPropagation="true" />
+                        </div>
+                        <div class="player-info">
+                            <Icon Name="IconName.User" />
+                            <span>@player.Name</span>
+                        </div>
+                        @if (player.IsActive)
+                        {
+                            <div class="active-badge">
+                                <Icon Name="IconName.Check" />
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
         }
-    </ListGroup>
+        else
+        {
+            <Alert Color="Color.Info" Visible Class="no-players-alert">
+                <Icon Name="IconName.InfoCircle" />
+                <p>No players available. Add players first!</p>
+                <Button Color="Color.Primary" @onclick="GoToAddPlayer">
+                    <Icon Name="IconName.UserPlus" />
+                    Add Players
+                </Button>
+            </Alert>
+        }
+    </div>
 
-    <b>Choose Game Settings</b>
-    <ListGroup id="gameSettings" style="inline-grid">
-        <ListGroupItem style="inline-grid">
-            <b>Mode</b>
-            <Select @bind-SelectedValue="@selectedValue">
-                <SelectItem Value="1">X01</SelectItem>
-            </Select>
-        </ListGroupItem>
+    <div class="settings-section">
+        <h3>
+            ⚙️ Game Settings
+        </h3>
 
+        <div class="game-settings-grid">
+            <div class="setting-card">
+                <label>
+                    <Icon Name="IconName.Play" />
+                    Game Mode
+                </label>
+                <Select @bind-SelectedValue="@StateContainer.CurrentGameSettings.GameMode" Class="custom-select">
+                    <SelectItem Value="GameMode.X01">X01</SelectItem>
+                    <SelectItem Value="GameMode.Cricket">Cricket</SelectItem>
+                    <SelectItem Value="GameMode.AroundTheClock">Around the Clock</SelectItem>
+                </Select>
+            </div>
 
-        <ListGroupItem style="inline-grid">
-            <b>Points</b>
-            <Select @bind-SelectedValue="@selectedValue">
-                <SelectItem Value="1">101</SelectItem>
-                <SelectItem Value="2">301</SelectItem>
-                <SelectItem Value="3">501</SelectItem>
+            @if (StateContainer.CurrentGameSettings.GameMode == GameMode.X01)
+            {
+                <div class="setting-card">
+                    <label>
+                        <Icon Name="IconName.Dashboard" />
+                        Starting Score
+                    </label>
+                    <Select @bind-SelectedValue="@StateContainer.CurrentGameSettings.StartingScore" Class="custom-select">
+                        <SelectItem Value="101">101</SelectItem>
+                        <SelectItem Value="301">301</SelectItem>
+                        <SelectItem Value="501">501</SelectItem>
+                        <SelectItem Value="701">701</SelectItem>
+                    </Select>
+                </div>
 
-            </Select>
-        </ListGroupItem>
+                <div class="setting-card">
+                    <label>
+                        <Icon Name="IconName.Flag" />
+                        Checkout Mode
+                    </label>
+                    <Select @bind-SelectedValue="@StateContainer.CurrentGameSettings.CheckoutMode" Class="custom-select">
+                        <SelectItem Value="CheckoutMode.SingleOut">Single Out</SelectItem>
+                        <SelectItem Value="CheckoutMode.DoubleOut">Double Out</SelectItem>
+                        <SelectItem Value="CheckoutMode.MasterOut">Master Out</SelectItem>
+                    </Select>
+                </div>
+            }
+        </div>
+    </div>
 
-        <ListGroupItem style="inline-grid">
-            <b>Checkout</b>
-            <Select @bind-SelectedValue="@selectedValue">
-                <SelectGroup>
-                    <SelectItem Value="1">Single Out</SelectItem>
-
-                </SelectGroup>
-
-                <SelectGroup>
-                    <SelectItem Value="2">Double Out</SelectItem>
-
-                </SelectGroup>
-            </Select>
-        </ListGroupItem>
-        
-    </ListGroup>
-
-    
-
+    <Button Color="Color.Success" @onclick="StartGame" Class="start-game-button" Disabled="@(!StateContainer.Players.Any(p => p.IsActive))">
+        <Icon Name="IconName.Play" />
+        Start Game
+    </Button>
 </div>
 
-<Button Color="Color.Primary" @onclick="startGame" style="position:absolute; bottom:0vh; right:1vh; ">
-    Start
-</Button>
-
 @code {
-    private int selectedValue;
-
     protected override async Task OnInitializedAsync()
     {
         await GetPlayerIDAsync();
         await LoadPlayers();
-        StateContainer.game.render();
-
+        StateContainer.game?.render();
     }
 
     private async Task LoadPlayers()
     {
-        for(int i = 0; i < StateContainer.playerID; i++)
+        StateContainer.Players.Clear();
+
+        for (int i = 0; i < StateContainer.playerID; i++)
         {
             await GetValueAsync(i);
-
         }
 
-        @foreach (Player player in StateContainer.Players)
-        {
-            Console.WriteLine(player.Name);
-        }
-        Console.WriteLine("Count is " + StateContainer.Players.Count);
-
-        StateContainer.game.render();
-
+        StateContainer.game?.render();
     }
-
-
 
     public async Task GetPlayerIDAsync()
     {
         StateContainer.playerID = await IndexedDbAccessor.GetValueAsync<int>("playerID", 0);
-
-
     }
 
     public async Task GetValueAsync(int i)
@@ -108,25 +137,45 @@
         JsonDocument storedPlayer = await IndexedDbAccessor.GetValueAsync<JsonDocument>("players", i);
         string name = storedPlayer.RootElement.GetProperty("name").GetString() ?? "";
         StateContainer.Players.Add(new Player(i, name));
-
-        Console.WriteLine("Added Player " + name);
     }
 
-    public void startGame()
+    private void TogglePlayer(Player player)
     {
-        StateContainer.isGameOver = false;
-        savePlayers();
-        StateContainer.game.render();
+        player.IsActive = !player.IsActive;
     }
 
-    public void savePlayers()
+    private void GoBack()
     {
-        foreach(Player player in StateContainer.Players)
+        NavigationManager.NavigateTo("/");
+    }
+
+    private void GoToAddPlayer()
+    {
+        NavigationManager.NavigateTo("/");
+        StateContainer.isAddPlayerComponentVisible = true;
+    }
+
+    public void StartGame()
+    {
+        StateContainer.activePlayers.Clear();
+
+        foreach (Player player in StateContainer.Players)
         {
             if (player.IsActive)
             {
                 StateContainer.activePlayers.Add(player);
             }
         }
+
+        if (StateContainer.activePlayers.Count == 0)
+        {
+            return;
+        }
+
+        StateContainer.CurrentGameSettings.PlayerIds = StateContainer.activePlayers.Select(p => p.Id).ToList();
+        StateContainer.GameService.StartNewGame(StateContainer.CurrentGameSettings, StateContainer.activePlayers);
+
+        StateContainer.isGameOver = false;
+        StateContainer.game?.render();
     }
 }

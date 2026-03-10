@@ -1,6 +1,178 @@
 ﻿@page "/statistics"
-<h3>Statistics</h3>
+@using Classes
+@using System.Text.Json
+@inject StateContainer StateContainer
+@inject NavigationManager NavigationManager
+@inject IndexedDbAccessor IndexedDbAccessor
+
+<div id="statistics-wrapper">
+    <div class="stats-header">
+        <Button Color="Color.Secondary" @onclick="GoBack" Size="Size.Small" Class="back-button">
+            <Icon Name="IconName.ArrowLeft" />
+            Back
+        </Button>
+        <h2>
+            📊 Player Statistics
+        </h2>
+    </div>
+
+    @if (StateContainer.Players.Any())
+    {
+        <div class="stats-grid">
+            @foreach (var player in StateContainer.Players)
+            {
+                <Card Class="player-stats-card">
+                    <CardHeader>
+                        <CardTitle>
+                            <Icon Name="IconName.User" />
+                            @player.Name
+                        </CardTitle>
+                    </CardHeader>
+                    <CardBody>
+                        <div class="stat-item">
+                            <span class="stat-label">
+                                <Icon Name="IconName.Play" />
+                                Games Played
+                            </span>
+                            <Badge Color="Color.Primary" Class="stat-value">
+                                @player.scoreStack.Count
+                            </Badge>
+                        </div>
+
+                        <div class="stat-item">
+                            <span class="stat-label">
+                                📈 Current Average
+                            </span>
+                            <Badge Color="Color.Success" Class="stat-value">
+                                @player.getCurrentAverage().ToString("F2")
+                            </Badge>
+                        </div>
+
+                        @if (player.scoreStack.Any())
+                        {
+                            <div class="stat-item">
+                                <span class="stat-label">
+                                    <Icon Name="IconName.Star" />
+                                    Best Score
+                                </span>
+                                <Badge Color="Color.Warning" Class="stat-value">
+                                    @player.scoreStack.Max()
+                                </Badge>
+                            </div>
+
+                            <div class="stat-item">
+                                <span class="stat-label">
+                                    <Icon Name="IconName.Check" />
+                                    Total Points
+                                </span>
+                                <Badge Color="Color.Info" Class="stat-value">
+                                    @player.scoreStack.Sum()
+                                </Badge>
+                            </div>
+                        }
+                    </CardBody>
+                </Card>
+            }
+        </div>
+    }
+    else
+    {
+        <Alert Color="Color.Info" Visible Class="no-data-alert">
+            <Icon Name="IconName.InfoCircle" />
+            <div>
+                <h4>No Player Data</h4>
+                <p>Add players to start tracking statistics!</p>
+                <Button Color="Color.Primary" @onclick="GoToHome">
+                    Add Players
+                </Button>
+            </div>
+        </Alert>
+    }
+
+    @if (StateContainer.GameService.CurrentGame != null)
+    {
+        <div class="current-game-stats">
+            <h3>
+                <Icon Name="IconName.Play" />
+                Current Game Statistics
+            </h3>
+            <Card>
+                <CardBody>
+                    <div class="game-info">
+                        <div class="info-item">
+                            <strong>Game Mode:</strong>
+                            @StateContainer.GameService.CurrentGame.Settings.GameMode
+                        </div>
+                        <div class="info-item">
+                            <strong>Started:</strong>
+                            @StateContainer.GameService.CurrentGame.StartedAt.ToLocalTime().ToString("g")
+                        </div>
+                    </div>
+
+                    <div class="player-stats-list">
+                        @foreach (var playerState in StateContainer.GameService.CurrentGame.PlayerStates)
+                        {
+                            <div class="current-player-stat">
+                                <div class="player-info">
+                                    <Icon Name="IconName.User" />
+                                    <strong>@playerState.PlayerName</strong>
+                                </div>
+                                <div class="player-metrics">
+                                    <Badge Color="Color.Primary">Score: @playerState.CurrentScore</Badge>
+                                    <Badge Color="Color.Success">Avg: @playerState.Average.ToString("F2")</Badge>
+                                    <Badge Color="Color.Info">Darts: @playerState.DartsThrown</Badge>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </CardBody>
+            </Card>
+        </div>
+    }
+</div>
 
 @code {
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPlayerID();
+        await LoadPlayers();
+    }
 
+    private async Task LoadPlayerID()
+    {
+        StateContainer.playerID = await IndexedDbAccessor.GetValueAsync<int>("playerID", 0);
+    }
+
+    private async Task LoadPlayers()
+    {
+        // Ensure players are loaded
+        if (!StateContainer.Players.Any() && StateContainer.playerID > 0)
+        {
+            StateContainer.Players.Clear();
+            for (int i = 0; i < StateContainer.playerID; i++)
+            {
+                try
+                {
+                    var storedPlayer = await IndexedDbAccessor.GetValueAsync<JsonDocument>("players", i);
+                    string name = storedPlayer.RootElement.GetProperty("name").GetString() ?? "";
+                    StateContainer.Players.Add(new Player(i, name));
+                }
+                catch
+                {
+                    // Skip if player doesn't exist
+                }
+            }
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    private void GoToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
 }
+
