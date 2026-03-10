@@ -1,0 +1,117 @@
+/* /Components/AddPlayerComponent.razor.rz.scp.css */
+
+/* /Components/GameComponent.razor.rz.scp.css */
+body[b-4jhkb85tuw] {
+}
+
+#Points-Keyboard[b-4jhkb85tuw]{
+    background-color:aliceblue;
+    border-radius:25px;
+    display: grid;
+    grid-template-columns:repeat(6,1fr);
+    grid-template-columns:repeat(5,1fr);
+
+}
+
+#Game-Wrapper[b-4jhkb85tuw] {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr;
+    justify-content: space-around;
+    align-items: stretch; /* Ensure grid items stretch vertically */
+    grid-gap: 20px; /* Adjust gap between grid items as needed */
+    height: 100vh;
+}
+
+#Points-Overview[b-4jhkb85tuw] {
+    background-color: aliceblue;
+    border-radius: 25px;
+}
+/* /Components/GameSettingsComponent.razor.rz.scp.css */
+body[b-niy360zf1q] {
+}
+
+
+#gameSettings[b-niy360zf1q]{
+    top:60vh;
+}
+
+#GameSettingsWrapper[b-niy360zf1q]{
+
+    height:100vh;
+
+}
+/* /Components/HomeCardComponent.razor.rz.scp.css */
+body[b-rvew7v0hep] {
+}
+
+.homeCardWrapper[b-rvew7v0hep] {
+    border-radius: 25px;
+    background-color: aliceblue;
+    position:relative;
+}
+#HomeCardTitle[b-rvew7v0hep] {
+    height: 20%;
+    width: 20%;
+    left: 44%;
+    position: relative
+}
+
+
+#img[b-rvew7v0hep] {
+    width: 5vh;
+    height: 5vh;
+    top: 50%;
+    left: 45%;
+    position:relative
+}
+/* /Pages/Game.razor.rz.scp.css */
+body[b-wv7r7lidbd] {
+    height:100vh;
+}
+
+.GameSettings[b-wv7r7lidbd] {
+    height:100vh;
+    margin-left: 5vh;
+    margin-right: 5vh;
+    position: relative
+}
+
+#Game-Wrapper[b-wv7r7lidbd] {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows:1fr;
+    justify-content: space-around;
+    align-items: stretch; /* Ensure grid items stretch vertically */
+    gap: 20px; /* Adjust gap between grid items as needed */
+    height: 100vh;
+}
+/* /Pages/Home.razor.rz.scp.css */
+body[b-a02r355i4l] {
+    height:100vh;
+}
+#app[b-a02r355i4l]{
+    height:100vh;
+}
+
+.HomeCardContainer[b-a02r355i4l] {
+    display: grid;
+    padding:5%;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto; /* Change to 'auto' or specific height if needed */
+    justify-content: space-around;
+    align-items: stretch; /* Ensure grid items stretch vertically */
+    gap: 20px; /* Adjust gap between grid items as needed */
+    width: 100%;
+    height: 100vh;
+}
+
+    .HomeCardContainer > *[b-a02r355i4l] {
+        /* Optionally, you can set specific styles for grid items */
+        /* For example, to ensure items fill the available space */
+        width: 100%; /* Ensure items fill available width */
+        height: 100%; /* Ensure items fill available height */
+    }
+/* /Pages/Statistics.razor.rz.scp.css */
+body[b-110n2zrlv2] {
+}
