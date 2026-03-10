@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "BlazingDartsForFriends",
   "resources": {
-    "hash": "sha256-bf97pESrdv/sQoGIn8NLEgRB1CNoqkI7VlMnydvcAmU=",
+    "hash": "sha256-vKKfxpkyEwWwDSEQtkkYmkv6VqOInJDXudWO+yZqa9c=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-NljIbpK/1KCj0+knpX8U77Rbl5kTtfFIuFjK7AuczEw="
     },
@@ -82,7 +82,7 @@
       "System.wasm": "sha256-jXhnUNHzjjL7Plo7WcHuX7V5Dc/Umt+qmGGC+Js76SE=",
       "netstandard.wasm": "sha256-mj60mXirfOcCJpiKHcOGYOe58J19Nve7D1c+aqoXHKA=",
       "System.Private.CoreLib.wasm": "sha256-gNuvRsZygdpVIc+dWmoyvOTXa6zLyPKeql5IMsuo8Hw=",
-      "BlazingDartsForFriends.wasm": "sha256-Vdnae0+wl5v3MTISMlY/nsQ1QuK79EwLVgysjDXuBn0="
+      "BlazingDartsForFriends.wasm": "sha256-vBJDnmijMayItUl+3wWPaNcInL6TZwOqdI1XLwEeUA0="
     }
   },
   "cacheBootResources": true,
