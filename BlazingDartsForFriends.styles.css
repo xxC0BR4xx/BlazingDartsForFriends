@@ -948,6 +948,7 @@ body[b-a02r355i4l] {
     width: 100%;
     height: 100%;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .HomeCardContainer > *:hover[b-a02r355i4l] {
