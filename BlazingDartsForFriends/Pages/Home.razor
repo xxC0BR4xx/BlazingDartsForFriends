@@ -1,24 +1,23 @@
 ﻿@page "/"
 
 @inject StateContainer StateContainer
-
+@inject NavigationManager NavigationManager
 
 @if (!StateContainer.isAddPlayerComponentVisible)
 {
-
     <div class="HomeCardContainer">
-        <a href="/game">
+        <div @onclick="NavigateToGame">
             <HomeCardComponent title="New Game" imgSource="dart_board.svg">
             </HomeCardComponent>
-        </a>
+        </div>
 
         <HomeCardComponent title="Add Player" OnCardClick="toggleAddPlayer" imgSource="add_player.svg">
         </HomeCardComponent>
 
-        <a href="/statistics">
+        <div @onclick="NavigateToStatistics">
             <HomeCardComponent title="Statistics" imgSource="statistics.svg">
             </HomeCardComponent>
-        </a>
+        </div>
 
         <HomeCardComponent title="Settings" imgSource="settings.svg">
         </HomeCardComponent>
@@ -38,7 +37,15 @@
 
 @code{
 
+    private void NavigateToGame()
+    {
+        NavigationManager.NavigateTo("game");
+    }
 
+    private void NavigateToStatistics()
+    {
+        NavigationManager.NavigateTo("statistics");
+    }
 
     private void toggleAddPlayer()
     {
