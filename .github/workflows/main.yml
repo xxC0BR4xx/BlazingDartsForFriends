@@ -1,0 +1,41 @@
+name: Build and Deploy Blazor WASM to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      # 1️⃣ Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Setup .NET SDK
+      - name: Setup .NET 8 SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.200
+
+      # 3️⃣ Restore dependencies
+      - name: Restore .NET packages
+        run: dotnet restore
+
+      # 4️⃣ Publish Blazor WebAssembly project
+      - name: Publish Blazor WASM
+        run: dotnet publish -c Release -o release /p:BaseHref=/BlazingDartsForFriends/
+
+
+      # 5️⃣ Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages           # Branch to deploy to
+          folder: release/wwwroot    # Folder containing index.html
+          clean: true                # Remove old files trigger 
