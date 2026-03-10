@@ -288,12 +288,12 @@
             confirmationTitle = "Leave Game?";
             confirmationMessage = "Are you sure you want to go back? The current game will be lost.";
             confirmationButtonText = "Leave Game";
-            confirmedAction = () => NavigationManager.NavigateTo("/");
+            confirmedAction = () => NavigationManager.NavigateTo("");
             confirmationModal?.Show();
         }
         else
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("");
         }
     }
 
