@@ -22,7 +22,7 @@ namespace BlazingDartsForFriends.Classes
         {
             if (_accessorJsRef.IsValueCreated is false)
             {
-                _accessorJsRef = new(await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/IndexedDbAccessor.js"));
+                _accessorJsRef = new(await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./IndexedDbAccessor.js"));
             }
         }
 
