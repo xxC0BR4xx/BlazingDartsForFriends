@@ -1,6 +1,8 @@
 ﻿@using System.Text.Json
 @using BlazingDartsForFriends.Models
+@using Microsoft.JSInterop
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <div id="GameSettingsWrapper">
     <div class="settings-header">
@@ -146,12 +148,12 @@
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo("");
+        NavigationManager.NavigateTo("./", forceLoad: false);
     }
 
     private void GoToAddPlayer()
     {
-        NavigationManager.NavigateTo("");
+        NavigationManager.NavigateTo("./", forceLoad: false);
         StateContainer.isAddPlayerComponentVisible = true;
     }
 
